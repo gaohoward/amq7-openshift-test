@@ -32,7 +32,6 @@ public class HAConnectionTest extends OpenshiftJmsTestBase {
 
    @BeforeAll
    public static void beforeAll(TestInfo info) {
-      System.out.println("before all in chold. info: " + info.getTestClass());
    }
 
    @BeforeEach
@@ -53,6 +52,7 @@ public class HAConnectionTest extends OpenshiftJmsTestBase {
       System.out.println("begin test");
       String host = getOpenshiftHost();
       String port = getOpenshiftPort();
+      System.out.println("got host: " + host + " port: " + port);
       ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("tcp://" + host + ":" + port);
       Connection conn = cf.createConnection();
       System.out.println("got connection");

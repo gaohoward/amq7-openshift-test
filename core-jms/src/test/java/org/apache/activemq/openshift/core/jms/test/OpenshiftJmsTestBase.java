@@ -25,8 +25,8 @@ import java.util.Properties;
 
 public class OpenshiftJmsTestBase {
 
-   public static final String OPENSHIFT_HOST = "openshift.host";
-   public static final String OPENSHIFT_PORT = "openshift.port";
+   public static final String OPENSHIFT_HOST = "openshift.exported.host";
+   public static final String OPENSHIFT_PORT = "openshift.exported.port";
 
    protected static Properties rootProperties;
 
@@ -41,7 +41,7 @@ public class OpenshiftJmsTestBase {
    }
 
    protected String getOpenshiftHost() {
-      return getTestProperty(OPENSHIFT_HOST, "172.30.9.135");
+      return getTestProperty(OPENSHIFT_HOST, "localhost");
    }
 
    protected String getOpenshiftPort() {
