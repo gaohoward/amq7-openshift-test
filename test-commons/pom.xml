@@ -29,5 +29,6 @@
    <packaging>jar</packaging>
    <name>Common util for tests</name>
 
-
+   <dependencies>
+   </dependencies>
 </project>
