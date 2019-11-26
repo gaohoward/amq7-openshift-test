@@ -16,6 +16,8 @@
  */
 package org.apache.activemq.openshift.core.jms.test;
 
+import org.apache.activemq.artemis.api.core.TransportConfiguration;
+import org.apache.activemq.artemis.jms.client.ActiveMQConnection;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -35,28 +37,28 @@ public class HAConnectionTest extends OpenshiftJmsTestBase {
    }
 
    @BeforeEach
-   public void setUp() throws Exception
-   {
+   public void setUp() throws Exception {
       System.out.println("before each...");
    }
 
    @AfterEach
-   public void tearDown() throws Exception
-   {
+   public void tearDown() throws Exception {
       System.out.println("after each");
    }
 
    @Test
-   public void testSingleConnection() throws Exception
-   {
+   public void testSingleConnection() throws Exception {
       System.out.println("begin test");
       String host = getOpenshiftHost();
       String port = getOpenshiftPort();
       System.out.println("got host: " + host + " port: " + port);
-      ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("tcp://" + host + ":" + port);
-      Connection conn = cf.createConnection();
-      System.out.println("got connection");
-      conn.close();
-      cf.close();
+      try (ActiveMQConnectionFactory cf = new ActiveMQConnectionFactory("tcp://" + host + ":" + port)) {
+         try (Connection conn = cf.createConnection()) {
+            System.out.println("got connection " + conn);
+            ActiveMQConnection amqConn = (ActiveMQConnection) conn;
+            TransportConfiguration tc = amqConn.getSessionFactory().getConnectorConfiguration();
+            System.out.println("tc is: " + tc);
+         }
+      }
    }
 }
