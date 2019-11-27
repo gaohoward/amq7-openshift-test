@@ -16,43 +16,73 @@
  */
 package org.apache.activemq.openshift.core.jms.test;
 
+import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.openshift.test.commons.ConfigUtil;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 public class OpenshiftJmsTestBase {
+
+   protected static final Logger logger = LoggerFactory.getLogger(OpenshiftJmsTestBase.class);
 
    public static final String OPENSHIFT_HOST = "openshift.exported.host";
    public static final String OPENSHIFT_PORT = "openshift.exported.port";
 
    protected static Properties rootProperties;
 
+   protected static String host;
+   protected static String port;
+   protected static String normalUrl;
+   protected static String haUrl;
+
+   protected static Map<String, ActiveMQConnectionFactory> factories = new HashMap<>();
+
    @BeforeAll
    public static void init(TestInfo info) throws Exception {
       rootProperties = ConfigUtil.loadProperties("base.properties");
+      host = getOpenshiftHost();
+      port = getOpenshiftPort();
+      normalUrl = "tcp://" + host + ":" + port;
+      haUrl = normalUrl + "?ha=true";
+      logger.info("got host: {} and port: {}", host, port);
    }
 
    @AfterAll
    public static void cleanup() throws Exception {
-
+      for (ActiveMQConnectionFactory cf : factories.values()) {
+         cf.close();
+      }
    }
 
-   protected String getOpenshiftHost() {
+   protected static String getOpenshiftHost() {
       return getTestProperty(OPENSHIFT_HOST, "localhost");
    }
 
-   protected String getOpenshiftPort() {
+   protected static String getOpenshiftPort() {
       return getTestProperty(OPENSHIFT_PORT, "61616");
    }
 
-   private String getTestProperty(String key, String defValue) {
+   private static String getTestProperty(String key, String defValue) {
       String value = rootProperties.getProperty(key);
       if (value != null) {
          return value;
       }
       return defValue;
+   }
+
+   protected ActiveMQConnectionFactory getConnectionFactory(String url) {
+      ActiveMQConnectionFactory cf = factories.get(url);
+      if (cf == null) {
+         cf = new ActiveMQConnectionFactory(url);
+         factories.put(url, cf);
+      }
+      return cf;
    }
 }
